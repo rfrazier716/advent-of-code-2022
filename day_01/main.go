@@ -9,6 +9,10 @@ import (
 	"strings"
 )
 
+type Backpack = []int
+type Elves = []Backpack
+
+// Create a Heap for Part 2, since we only need the top three backpacks
 type IntHeap []int
 
 // required for the sort.Interface
@@ -30,69 +34,62 @@ func (h *IntHeap) Pop() any {
 	return x
 }
 
-func partOne(calories []int) {
-	sum, max := 0, 0
-	for i := range calories {
-		if calories[i] == -1 {
-			// update max and reset
-			if sum > max {
-				max = sum
-			}
-			sum = 0
-		} else {
-			sum += calories[i]
+func partOne(elfBrigade Elves) int {
+	// this is just keeping track of the max
+	max := 0
+	for _, pack := range elfBrigade {
+		if calories := sum(pack); calories > max {
+			max = calories
 		}
 	}
-	fmt.Println(max)
+	return max
 }
 
-func partTwo(calories []int) {
+func partTwo(elfBrigade Elves) int {
 	h := IntHeap{}
 	heap.Init(&h)
-	sum := 0
-	for i := range calories {
-		if calories[i] == -1 {
-			if sum > h[0] {
-				heap.Push(&h, sum)
-			}
-			for len(h) > 3 {
-				heap.Pop(&h)
-			}
-			sum = 0
-		} else {
-			sum += calories[i]
+
+	for _, pack := range elfBrigade {
+		calories := sum(pack)
+		heap.Push(&h, calories)
+		for len(h) > 3 {
+			heap.Pop(&h)
 		}
 	}
 
-	totalSum := 0
-	for i := range h {
-		totalSum += h[i]
-	}
+	return sum(h)
+}
 
-	fmt.Println(totalSum)
+func sum(slice []int) (res int) {
+	res = 0
+	for i := range slice {
+		res += slice[i]
+	}
+	return
 }
 
 func main() {
 	puzzleInput, err := os.ReadFile("input.txt")
 	if err != nil {
 		log.Fatalf("Could not Load Puzzle Input: %v", err)
-
 	}
-	lines := strings.Split(string(puzzleInput), "\n")
-	calories := make([]int, 0)
 
+	lines := strings.Split(string(puzzleInput), "\n")
+
+	// Create our Elves on a Hike
+	elfBrigade := Elves{make(Backpack, 0)}
 	for i := range lines {
 		if num, err := strconv.Atoi(lines[i]); err == nil {
-			calories = append(calories, num)
-		} else if len(lines) == 0 {
-			// empty line
-			calories = append(calories, -1)
+			elfBrigade[len(elfBrigade)-1] = append(elfBrigade[len(elfBrigade)-1], num)
+		} else if len(lines[i]) == 0 {
+			// empty line - make a new struct
+			elfBrigade = append(elfBrigade, make(Backpack, 0))
 		} else {
+			// Shouldn't hit this...
 			log.Printf("Could not parse line %v: %v", i, lines[i])
 		}
 	}
 
-	partOne(calories)
-	partTwo(calories)
-
+	fmt.Printf("Part One Solution: %v\n", partOne(elfBrigade))
+	fmt.Printf("Part Two Solution: %v\n", partTwo(elfBrigade))
 }
