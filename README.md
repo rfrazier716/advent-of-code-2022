@@ -11,6 +11,8 @@
     Solutions to 2022's <a href="https://adventofcode.com">Advent of Code</a> challenges, written in Go
   </p>
   <p align="center">
-  ⭐★★★★★★★★★★★★★★★★★★★★★★★★
+ ★★★★★ ★★★★★ ★★★★★ ★★★★★ ★★★★★
   </p>
-</p>
+</p> 
+
+<!--⭐ ->
