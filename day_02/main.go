@@ -11,16 +11,16 @@ type RpsHand int // A rock paper scissors hand
 
 const (
 	Rock     RpsHand = 0
-	Paper            = 1
-	Scissors         = 2
+	Paper    RpsHand = 1
+	Scissors RpsHand = 2
 )
 
 type RpsOutcome int
 
 const (
 	Win  RpsOutcome = 0
-	Loss            = 1
-	Draw            = 2
+	Loss RpsOutcome = 1
+	Draw RpsOutcome = 2
 )
 
 func (t RpsHand) verses(hand RpsHand) RpsOutcome {
@@ -31,17 +31,6 @@ func (t RpsHand) verses(hand RpsHand) RpsOutcome {
 		return Loss
 	default:
 		return Win
-	}
-}
-
-func LosesTo(hand RpsHand) RpsHand {
-	switch hand {
-	case Rock:
-		return Paper
-	case Paper:
-		return Rock
-	default:
-		return Scissors
 	}
 }
 
@@ -87,7 +76,7 @@ func IntoGuidePartA(input string) (game RpsGame, err error) {
 	return
 }
 
-func IntoGuidePartB(input string) (game RpsGame, err error) {
+func partBGuideCreator() func(string) (RpsGame, error) {
 	// we need our second person to be playerA for the game struct to work
 	losingLUT := map[RpsHand]RpsHand{
 		Rock:     Scissors,
@@ -101,31 +90,35 @@ func IntoGuidePartB(input string) (game RpsGame, err error) {
 		Scissors: Rock,
 	}
 
-	switch input[0] {
-	case 'A':
-		game.playerB = Rock
-	case 'B':
-		game.playerB = Paper
-	case 'C':
-		game.playerB = Scissors
-	}
+	return func(input string) (game RpsGame, err error) {
+		switch input[0] {
+		case 'A':
+			game.playerB = Rock
+		case 'B':
+			game.playerB = Paper
+		case 'C':
+			game.playerB = Scissors
+		}
 
-	switch input[2] {
-	case 'X':
-		game.playerA = losingLUT[game.playerB]
-	case 'Y':
-		game.playerA = game.playerB
-	case 'Z':
-		game.playerA = winningLUT[game.playerB]
-	}
+		switch input[2] {
+		case 'X':
+			game.playerA = losingLUT[game.playerB]
+		case 'Y':
+			game.playerA = game.playerB
+		case 'Z':
+			game.playerA = winningLUT[game.playerB]
+		}
 
-	return
+		return
+	}
 }
 
-func PuzzlePartOne(rounds []RpsGame) int {
+var IntoGuidePartB func(string) (RpsGame, error) = partBGuideCreator()
+
+func calculateMaxScore(guide []RpsGame) int {
 	totalScore := 0
-	for i := range rounds {
-		_, points := Play(rounds[i])
+	for i := range guide {
+		_, points := Play(guide[i])
 		totalScore += points
 	}
 	return totalScore
@@ -141,6 +134,7 @@ func main() {
 	lines := strings.Split(string(puzzleInput), "\n")
 	roundsA := make([]RpsGame, 0, len(lines))
 	roundsB := make([]RpsGame, 0, len(lines))
+
 	for i := range lines {
 		if len(lines[i]) > 0 {
 			round, _ := IntoGuidePartA(lines[i])
@@ -150,8 +144,8 @@ func main() {
 		}
 	}
 
-	partOne := PuzzlePartOne(roundsA)
-	partTwo := PuzzlePartOne(roundsB)
+	partOne := calculateMaxScore(roundsA)
+	partTwo := calculateMaxScore(roundsB)
 
 	fmt.Printf("Part One Solution: %v\n", partOne)
 	fmt.Printf("Part One Solution: %v\n", partTwo)
