@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"sort"
 	"strconv"
 	"strings"
 )
@@ -34,30 +35,17 @@ func (h *IntHeap) Pop() any {
 	return x
 }
 
-func partOne(elfBrigade Elves) int {
-	// this is just keeping track of the max
-	max := 0
-	for _, pack := range elfBrigade {
-		if calories := sum(pack); calories > max {
-			max = calories
-		}
-	}
-	return max
-}
-
-func partTwo(elfBrigade Elves) int {
+func nLargest(maxElements int) func(int) IntHeap {
 	h := IntHeap{}
 	heap.Init(&h)
 
-	for _, pack := range elfBrigade {
-		calories := sum(pack)
-		heap.Push(&h, calories)
-		for len(h) > 3 {
+	return func(val int) IntHeap {
+		heap.Push(&h, val)
+		for len(h) > maxElements {
 			heap.Pop(&h)
 		}
+		return h
 	}
-
-	return sum(h)
 }
 
 func sum(slice []int) (res int) {
@@ -68,6 +56,19 @@ func sum(slice []int) (res int) {
 	return
 }
 
+func TopThreePacks(brigade Elves) []int {
+	var topPacks []int
+
+	tracker := nLargest(3) // keep thrack of the three largest elements in our queue
+	for _, pack := range brigade {
+		calories := sum(pack)
+		topPacks = tracker(calories)
+	}
+
+	sort.Ints(topPacks)
+	return topPacks
+}
+
 func main() {
 	puzzleInput, err := os.ReadFile("input.txt")
 	if err != nil {
@@ -75,6 +76,7 @@ func main() {
 	}
 
 	lines := strings.Split(string(puzzleInput), "\n")
+	lines = lines[:len(lines)-1] // remove the final element which is an empty string
 
 	// Create our Elves on a Hike
 	elfBrigade := Elves{make(Backpack, 0)}
@@ -90,6 +92,9 @@ func main() {
 		}
 	}
 
-	fmt.Printf("Part One Solution: %v\n", partOne(elfBrigade))
-	fmt.Printf("Part Two Solution: %v\n", partTwo(elfBrigade))
+	// calculate the three most calorically dense packs
+	heaviestPacks := TopThreePacks(elfBrigade)
+
+	fmt.Printf("Part One Solution: %v\n", heaviestPacks[len(heaviestPacks)-1])
+	fmt.Printf("Part Two Solution: %v\n", sum(heaviestPacks))
 }
