@@ -17,6 +17,19 @@ type CraneInstruction struct {
 	To     int
 }
 
+func clone(stacks []Stack) []Stack {
+	// Deep-copy a Stack
+	// Since it's a slice of slices, we cannot use teh built in copy method
+	
+	cloned := make([]Stack, len(stacks))
+	for i := range stacks {
+		cloned[i] = make(Stack, len(stacks[i]))
+		copy(cloned[i], stacks[i])
+	}
+
+	return cloned
+}
+
 func ParseInput(lines []string) (stacks []Stack, instructions []CraneInstruction) {
 	loadingStacks := true
 	matcher, _ := regexp.Compile(`move ([0-9]+) from ([0-9]+) to ([0-9]+)`)
@@ -49,7 +62,7 @@ func ParseInput(lines []string) (stacks []Stack, instructions []CraneInstruction
 	return
 }
 
-func PuzzlePartOne(stacks []Stack, instructions []CraneInstruction, multiMove bool) string {
+func Process(stacks []Stack, instructions []CraneInstruction, multiMove bool) []Stack {
 	for _, instruction := range instructions {
 		from := &stacks[instruction.From-1]
 		to := &stacks[instruction.To-1]
@@ -66,11 +79,29 @@ func PuzzlePartOne(stacks []Stack, instructions []CraneInstruction, multiMove bo
 		*from = (*from)[:len(*from)-instruction.Amount]
 	}
 
+	return stacks
+}
+
+func GetUppermostValues(stacks []Stack) string {
+	// Gets the top values of the stack
 	output := make([]rune, 0)
 	for _, val := range stacks {
 		output = append(output, val[len(val)-1])
 	}
 	return string(output)
+}
+
+func PuzzlePartOne(stacks []Stack, instructions []CraneInstruction) string {
+	// process the instructions
+	processed := Process(stacks, instructions, false)
+	return GetUppermostValues(processed)
+}
+
+
+func PuzzlePartTwo(stacks []Stack, instructions []CraneInstruction) string {
+	// process the instructions
+	processed := Process(stacks, instructions, true)
+	return GetUppermostValues(processed)
 }
 
 func main() {
@@ -82,11 +113,8 @@ func main() {
 	lines := strings.Split(string(puzzleInput), "\n")
 	lines = lines[:len(lines)-1]
 	stacks, instructions := ParseInput(lines)
-	ptOneStack := make([]Stack, len(stacks))
-	copy(ptOneStack, stacks)
-	ptTwoStack := make([]Stack, len(stacks))
-	copy(ptTwoStack, stacks)
 
-	fmt.Printf("Part One Solution: %v\n", PuzzlePartOne(ptOneStack, instructions, false))
-	fmt.Printf("Part Two Solution: %v\n", PuzzlePartOne(ptTwoStack, instructions, true))
+	// need to clone our stacks since the function mutates it
+	fmt.Printf("Part One Solution: %v\n", PuzzlePartOne(clone(stacks), instructions))
+	fmt.Printf("Part Two Solution: %v\n", PuzzlePartTwo(stacks, instructions))
 }

@@ -4,19 +4,6 @@ import (
 	"testing"
 )
 
-func TestSomethingSilly(t *testing.T) {
-	testTable := []struct {
-		a        int
-		b        int
-		expected int
-	}{{1, 2, 3}, {2, 3, 5}, {-4, 7, 3}}
-	for i, test := range testTable {
-		if res := test.a + test.b; res != test.expected {
-			t.Errorf("Test index %v failed. Expected %v, got %v", i, test.expected, res)
-		}
-	}
-}
-
 func TestParser(t *testing.T) {
 	input := []string{
 		"ABC",
@@ -37,7 +24,7 @@ func TestParser(t *testing.T) {
 		t.Errorf("Parsed Stacks Incorrectly, expected %v, got %v", expectedStacks, actInstructions)
 	} else {
 		for i := range expectedStacks {
-			if expectedStacks[i] != actStacks[i] {
+			if string(expectedStacks[i]) != string(actStacks[i]) {
 				t.Errorf("Stack %v does not match expected. Expected %v, got %v", i, expectedStacks[i], actStacks[i])
 			}
 		}
