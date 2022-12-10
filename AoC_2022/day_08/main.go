@@ -7,22 +7,14 @@ import (
 	"strings"
 )
 
-type visibility struct {
-	northern int
-	southern int
-	eastern  int
-	western  int
-}
-
 type coord2D struct {
 	row int
 	col int
 }
 
 type tree struct {
-	height     int
-	position   coord2D
-	visibility visibility
+	height   int
+	position coord2D
 }
 
 type treeStack struct {
@@ -92,9 +84,9 @@ func PuzzlePartOne(input []string) int {
 		for c, char := range input[r] {
 			// fmt.Print(r, c)
 			// fmt.Printf("--%c--\n", char)
-			height := int(char) - 48                              // quick conversion
-			toAppend := tree{height, coord2D{r, c}, visibility{}} // create an element to insert into stacks
-			viewCounter[r][c] = 2                                 // initialize the viewCounter value with 2 (we assum we see it from both horiz and vert)
+			height := int(char) - 48                // quick conversion
+			toAppend := tree{height, coord2D{r, c}} // create an element to insert into stacks
+			viewCounter[r][c] = 2                   // initialize the viewCounter value with 2 (we assum we see it from both horiz and vert)
 
 			popped := updateStack(&rowView[r], &toAppend)
 			for i := range popped {
@@ -124,26 +116,6 @@ func PuzzlePartOne(input []string) int {
 	return visibleTrees
 }
 
-// func VisibilityScore(vis Visibility) int {
-// 	return vis.North * vis.South * vis.East * vis.West
-// }
-
-// func PuzzlePartTwo(input []string) int {
-// 	maxVisibility := 0
-
-// 	visibilityMemo := make([][]*Visibility, len(input))
-// 	for i := range input {
-// 		visibilityMemo[i] = make([]*Visibility, len(input[i]))
-// 	}
-
-// 	var dfsHelper func(row int, col int) int
-// 	dfsHelper = func(row int, col int) int {
-// 		if visibilityMemo[row][col] != nil {
-// 			return visibilityMemo
-// 		}
-// 	}
-
-// }
 type forestViews struct {
 	up    [][]int
 	down  [][]int
@@ -257,6 +229,24 @@ func calculateViews(forest [][]int) forestViews {
 	}
 }
 
+// func viewableFromLeft(forest [][]int, views forestViews, row int, col int) bool {
+// 	return col == 0 || views.left[row][col] == col && forest[row][col] > forest[row][0]
+// }
+
+// func viewableFromRight(forest [][]int, views forestViews, row int, col int) bool {
+// 	cols := len(forest[0])
+// 	return col == cols-1 || views.right[row][col] == cols-1 && forest[row][col] > forest[row][cols-1]
+// }
+
+// func viewableFromAbove(forest [][]int, views forestViews, row int, col int) bool {
+// 	return row == 0 || views.up[row][col] == row && forest[row][col] > forest[0][col]
+// }
+
+// func viewableFromBelow(forest [][]int, views forestViews, row int, col int) bool {
+// 	rows := len(forest)
+// 	return row == rows-1 || views.down[row][col] == rows-1 && forest[row][col] > forest[rows-1][col]
+// }
+
 func parseInput(input []string) [][]int {
 	parsed := make([][]int, len(input))
 	for r := range input {
@@ -267,6 +257,21 @@ func parseInput(input []string) [][]int {
 	}
 	return parsed
 }
+
+// func puzzlePartOne(forest [][]int, views forestViews) int {
+// 	numVisible := 0
+// 	rows = len(forest)
+// 	cols = len(forest[0])
+// 	for r := range forest {
+// 		for c := range forest[r] {
+// 			if (views.left[r][c] == r && views.left[r][c] > forest[r][0]) ||
+// 				(views.right[r][c] == cols-c-1 && views.right[r][c] > 2) {
+
+// 			}
+
+// 		}
+// 	}
+// }
 
 func puzzlePartTwo(views forestViews) int {
 	maxViewScore := 0
