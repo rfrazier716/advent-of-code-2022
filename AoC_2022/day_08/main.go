@@ -144,6 +144,143 @@ func PuzzlePartOne(input []string) int {
 // 	}
 
 // }
+type forestViews struct {
+	up    [][]int
+	down  [][]int
+	left  [][]int
+	right [][]int
+}
+
+type stackHelper struct {
+	val   int
+	index int
+}
+
+func furthestViewLookingLeft(forest [][]int) (view [][]int) {
+	view = make([][]int, len(forest))
+	for r := range forest {
+		view[r] = make([]int, len(forest[r]))
+		stack := make([]stackHelper, 0)
+		for c := range forest[r] {
+			for len(stack) > 0 && forest[r][c] > stack[len(stack)-1].val {
+				// pop our stack
+				stack = stack[:len(stack)-1]
+			}
+			// now we can update the view and push onto the stack
+			view[r][c] = c
+			if len(stack) > 0 {
+				view[r][c] -= stack[len(stack)-1].index
+			}
+			stack = append(stack, stackHelper{forest[r][c], c})
+		}
+	}
+	return
+}
+
+func furthestViewLookingRight(forest [][]int) (view [][]int) {
+	view = make([][]int, len(forest))
+	for r := range forest {
+		view[r] = make([]int, len(forest[r]))
+		stack := make([]stackHelper, 0)
+		for offset := range forest[r] {
+			c := len(forest[r]) - offset - 1
+			for len(stack) > 0 && forest[r][c] > stack[len(stack)-1].val {
+				// pop our stack
+				stack = stack[:len(stack)-1]
+			}
+			// now we can update the view and push onto the stack
+			view[r][c] = offset
+			if len(stack) > 0 {
+				view[r][c] -= stack[len(stack)-1].index
+			}
+			stack = append(stack, stackHelper{forest[r][c], offset})
+		}
+	}
+	return
+}
+
+func furthestViewLookingUp(forest [][]int) (view [][]int) {
+	view = make([][]int, len(forest))
+	for i := range forest {
+		view[i] = make([]int, len(forest[i]))
+	}
+
+	for c := range forest[0] {
+		stack := make([]stackHelper, 0)
+		for r := range forest {
+			for len(stack) > 0 && forest[r][c] > stack[len(stack)-1].val {
+				// pop our stack
+				stack = stack[:len(stack)-1]
+			}
+			// now we can update the view and push onto the stack
+			view[r][c] = r
+			if len(stack) > 0 {
+				view[r][c] -= stack[len(stack)-1].index
+			}
+			stack = append(stack, stackHelper{forest[r][c], r})
+		}
+	}
+	return
+}
+
+func furthestViewLookingDown(forest [][]int) (view [][]int) {
+	view = make([][]int, len(forest))
+	for i := range forest {
+		view[i] = make([]int, len(forest[i]))
+	}
+
+	for c := range forest[0] {
+		stack := make([]stackHelper, 0)
+		for offset := range forest {
+			r := len(forest) - offset - 1
+			for len(stack) > 0 && forest[r][c] > stack[len(stack)-1].val {
+				// pop our stack
+				stack = stack[:len(stack)-1]
+			}
+			// now we can update the view and push onto the stack
+			view[r][c] = offset
+			if len(stack) > 0 {
+				view[r][c] -= stack[len(stack)-1].index
+			}
+			stack = append(stack, stackHelper{forest[r][c], offset})
+		}
+	}
+	return
+}
+
+func calculateViews(forest [][]int) forestViews {
+	return forestViews{
+		furthestViewLookingUp(forest),
+		furthestViewLookingDown(forest),
+		furthestViewLookingLeft(forest),
+		furthestViewLookingRight(forest),
+	}
+}
+
+func parseInput(input []string) [][]int {
+	parsed := make([][]int, len(input))
+	for r := range input {
+		parsed[r] = make([]int, len(input[r]))
+		for c := range input[r] {
+			parsed[r][c] = int(input[r][c]) - 48 // simple since we know it's ascii 0-9
+		}
+	}
+	return parsed
+}
+
+func puzzlePartTwo(views forestViews) int {
+	maxViewScore := 0
+	for r := range views.up {
+		for c := range views.up[r] {
+			viewScore := views.up[r][c] * views.down[r][c] * views.left[r][c] * views.right[r][c]
+			if viewScore > maxViewScore {
+				maxViewScore = viewScore
+			}
+		}
+	}
+
+	return maxViewScore
+}
 
 func main() {
 	puzzleInput, err := os.ReadFile("input.txt")
@@ -153,5 +290,10 @@ func main() {
 
 	lines := strings.Split(string(puzzleInput), "\n")
 	lines = lines[:len(lines)-1]
-	fmt.Printf("Part One Solution: %v", PuzzlePartOne(lines))
+	forest := parseInput(lines)
+	views := calculateViews(forest)
+
+	fmt.Printf("Part One Solution: %v\n", PuzzlePartOne(lines))
+	fmt.Printf("Part Two Solution: %v\n", puzzlePartTwo(views))
+
 }

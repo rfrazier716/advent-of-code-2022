@@ -12,6 +12,14 @@ var testInput = []string{
 	"35390",
 }
 
+var parsedTestInput = [][]int{
+	{3, 0, 3, 7, 3},
+	{2, 5, 5, 1, 2},
+	{6, 5, 3, 3, 2},
+	{3, 3, 5, 4, 9},
+	{3, 5, 3, 9, 0},
+}
+
 func TestStackAppend(t *testing.T) {
 	trees := []*tree{
 		{height: 1},
@@ -48,6 +56,90 @@ func TestStackAppend(t *testing.T) {
 				if stack.trees[j].height != expected.trees[j].height {
 					t.Errorf("Stack mismatch at index %v, expected %v, got %v", j, expected.trees[j], stack.trees[j])
 				}
+			}
+		}
+	}
+}
+
+func TestParser(t *testing.T) {
+	expected := parsedTestInput
+	actual := parseInput(testInput)
+	for r := range actual {
+		for c := range actual[r] {
+			if act, exp := actual[r][c], expected[r][c]; act != exp {
+				t.Errorf("Error at index (%v, %v), expected %v, got %v", r, c, exp, act)
+			}
+		}
+	}
+}
+
+func TestViewFromLeft(t *testing.T) {
+	expected := [][]int{
+		{0, 1, 2, 3, 1},
+		{0, 1, 1, 1, 2},
+		{0, 1, 1, 1, 1},
+		{0, 1, 2, 1, 4},
+		{0, 1, 1, 3, 1},
+	}
+	actual := furthestViewLookingLeft(parsedTestInput)
+	for r := range actual {
+		for c := range actual[r] {
+			if act, exp := actual[r][c], expected[r][c]; act != exp {
+				t.Errorf("Error at index (%v, %v), expected %v, got %v", r, c, exp, act)
+			}
+		}
+	}
+}
+
+func TestViewFromRight(t *testing.T) {
+	expected := [][]int{
+		{2, 1, 1, 1, 0},
+		{1, 1, 2, 1, 0},
+		{4, 3, 1, 1, 0},
+		{1, 1, 2, 1, 0},
+		{1, 2, 1, 1, 0},
+	}
+	actual := furthestViewLookingRight(parsedTestInput)
+	for r := range actual {
+		for c := range actual[r] {
+			if act, exp := actual[r][c], expected[r][c]; act != exp {
+				t.Errorf("Error at index (%v, %v), expected %v, got %v", r, c, exp, act)
+			}
+		}
+	}
+}
+
+func TestViewLookingUp(t *testing.T) {
+	expected := [][]int{
+		{0, 0, 0, 0, 0},
+		{1, 1, 1, 1, 1},
+		{2, 1, 1, 2, 1},
+		{1, 1, 2, 3, 3},
+		{1, 2, 1, 4, 1},
+	}
+	actual := furthestViewLookingUp(parsedTestInput)
+	for r := range actual {
+		for c := range actual[r] {
+			if act, exp := actual[r][c], expected[r][c]; act != exp {
+				t.Errorf("Error at index (%v, %v), expected %v, got %v", r, c, exp, act)
+			}
+		}
+	}
+}
+
+func TestViewLookingDown(t *testing.T) {
+	expected := [][]int{
+		{2, 1, 1, 4, 3},
+		{1, 1, 2, 1, 1},
+		{2, 2, 1, 1, 1},
+		{1, 1, 1, 1, 1},
+		{0, 0, 0, 0, 0},
+	}
+	actual := furthestViewLookingDown(parsedTestInput)
+	for r := range actual {
+		for c := range actual[r] {
+			if act, exp := actual[r][c], expected[r][c]; act != exp {
+				t.Errorf("Error at index (%v, %v), expected %v, got %v", r, c, exp, act)
 			}
 		}
 	}
