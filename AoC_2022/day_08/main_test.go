@@ -145,38 +145,9 @@ func TestViewLookingDown(t *testing.T) {
 	}
 }
 
-// func TestViews(t *testing.T) {
-// 	views := calculateViews(parsedTestInput)
-// 	testTable := []struct {
-// 		row      int
-// 		col      int
-// 		visUp    bool
-// 		visDown  bool
-// 		visLeft  bool
-// 		visRight bool
-// 	}{
-// 		{0, 0, true, false, true, false},
-// 		{0, 0, true, false, false, true},
-// 	}
-// 	for i, testCase := range testTable {
-// 		if act, exp := viewableFromLeft(parsedTestInput, views, testCase.row, testCase.col), testCase.visLeft; exp != act {
-// 			t.Errorf("test failed at iteration %v, visible from left. Expected %v, got %v", i, exp, act)
-// 		}
-// 		if act, exp := viewableFromRight(parsedTestInput, views, testCase.row, testCase.col), testCase.visRight; exp != act {
-// 			t.Errorf("test failed at iteration %v, visible from right. Expected %v, got %v", i, exp, act)
-// 		}
-// 		if act, exp := viewableFromAbove(parsedTestInput, views, testCase.row, testCase.col), testCase.visUp; exp != act {
-// 			t.Errorf("test failed at iteration %v, visible from above. Expected %v, got %v", i, exp, act)
-// 		}
-// 		if act, exp := viewableFromBelow(parsedTestInput, views, testCase.row, testCase.col), testCase.visDown; exp != act {
-// 			t.Errorf("test failed at iteration %v, visible from below. Expected %v, got %v", i, exp, act)
-// 		}
-// 	}
-// }
-
 func TestPartOne(t *testing.T) {
 	expected := 21
-	soln := PuzzlePartOne(testInput)
+	soln := PuzzlePartOne(parsedTestInput)
 	if soln != 21 {
 		t.Errorf("Part One Test failed, expected %v, got %v", expected, soln)
 	}
