@@ -61,27 +61,27 @@ func updateStack(stack *treeStack, element *tree) (popped []*tree) {
 	return popped
 }
 
-func PuzzlePartOne(input []string) int {
-	viewCounter := make([][]int, len(input)) // counts how many directions our tree is viewable from
+func PuzzlePartOne(forest [][]int) int {
+	viewCounter := make([][]int, len(forest)) // counts how many directions our tree is viewable from
 	for i := range viewCounter {
-		viewCounter[i] = make([]int, len(input[0]))
+		viewCounter[i] = make([]int, len(forest[0]))
 	}
 
 	// need a couple of stacks keeping track of the row and column view
 	// any tree remaining in the stack is visible from the perimiter of the forest
 	// but we need to be aware of double counting
-	rowView := make([]treeStack, len(input)) // viewing along rows
+	rowView := make([]treeStack, len(forest)) // viewing along rows
 	for i := range rowView {
 		rowView[i] = newStack()
 	}
 
-	colView := make([]treeStack, len(input[0])) // viewing long columns
+	colView := make([]treeStack, len(forest[0])) // viewing long columns
 	for i := range colView {
 		colView[i] = newStack()
 	}
 
-	for r := range input {
-		for c, char := range input[r] {
+	for r := range forest {
+		for c, char := range forest[r] {
 			// fmt.Print(r, c)
 			// fmt.Printf("--%c--\n", char)
 			height := int(char) - 48                // quick conversion
@@ -229,24 +229,6 @@ func calculateViews(forest [][]int) forestViews {
 	}
 }
 
-// func viewableFromLeft(forest [][]int, views forestViews, row int, col int) bool {
-// 	return col == 0 || views.left[row][col] == col && forest[row][col] > forest[row][0]
-// }
-
-// func viewableFromRight(forest [][]int, views forestViews, row int, col int) bool {
-// 	cols := len(forest[0])
-// 	return col == cols-1 || views.right[row][col] == cols-1 && forest[row][col] > forest[row][cols-1]
-// }
-
-// func viewableFromAbove(forest [][]int, views forestViews, row int, col int) bool {
-// 	return row == 0 || views.up[row][col] == row && forest[row][col] > forest[0][col]
-// }
-
-// func viewableFromBelow(forest [][]int, views forestViews, row int, col int) bool {
-// 	rows := len(forest)
-// 	return row == rows-1 || views.down[row][col] == rows-1 && forest[row][col] > forest[rows-1][col]
-// }
-
 func parseInput(input []string) [][]int {
 	parsed := make([][]int, len(input))
 	for r := range input {
@@ -257,21 +239,6 @@ func parseInput(input []string) [][]int {
 	}
 	return parsed
 }
-
-// func puzzlePartOne(forest [][]int, views forestViews) int {
-// 	numVisible := 0
-// 	rows = len(forest)
-// 	cols = len(forest[0])
-// 	for r := range forest {
-// 		for c := range forest[r] {
-// 			if (views.left[r][c] == r && views.left[r][c] > forest[r][0]) ||
-// 				(views.right[r][c] == cols-c-1 && views.right[r][c] > 2) {
-
-// 			}
-
-// 		}
-// 	}
-// }
 
 func puzzlePartTwo(views forestViews) int {
 	maxViewScore := 0
@@ -296,9 +263,8 @@ func main() {
 	lines := strings.Split(string(puzzleInput), "\n")
 	lines = lines[:len(lines)-1]
 	forest := parseInput(lines)
+
+	fmt.Printf("Part One Solution: %v\n", PuzzlePartOne(forest))
 	views := calculateViews(forest)
-
-	fmt.Printf("Part One Solution: %v\n", PuzzlePartOne(lines))
 	fmt.Printf("Part Two Solution: %v\n", puzzlePartTwo(views))
-
 }
