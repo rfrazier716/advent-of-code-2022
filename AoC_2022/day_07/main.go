@@ -1,7 +1,6 @@
 package main
 
 import (
-	"container/heap"
 	"fmt"
 	"log"
 	"os"
@@ -149,60 +148,7 @@ func PuzzlePartOne(root *Directory) int {
 	return sum
 }
 
-// For Part Two we need to create some dataStructures for a MinHeap
-type QueueItem struct {
-	Item     *Directory
-	priority int
-}
-
-type PriorityQueue []QueueItem
-
-func (pq PriorityQueue) Len() int { return len(pq) }
-
-func (pq PriorityQueue) Less(i, j int) bool { return pq[i].priority > pq[j].priority } // swapping less to be greater means we make a maxheap vs. minHeap
-
-func (pq PriorityQueue) Swap(i, j int) { pq[i], pq[j] = pq[j], pq[i] }
-
-func (pq *PriorityQueue) Push(x any) { *pq = append(*pq, x.(QueueItem)) }
-
-func (pq *PriorityQueue) Pop() any {
-	old := *pq
-	n := len(old)
-	x := old[n-1] // get the last element
-	*pq = old[:n-1]
-	return x
-}
-
 func PuzzlePartTwo(root *Directory) int {
-	// For Part 2 we're going to use a Max Heap based on the size of the directory
-	// Every time a directory is popped from the heap, any subdirectories that are larger than the amount of space we need to clear are pushed back on it
-	// The final value pulled off the heap before it's empty will be the smallest directory that is still larger than the amount of space we need to clear
-
-	spaceToClear := totalFileSize(root) - 40000000 // calculate how much space we need to clear
-
-	// Create our Queue
-	h := PriorityQueue{{root, totalFileSize(root)}}
-	heap.Init(&h)
-
-	var lastPulledSize int // this keeps track of the last file pulled
-	
-	// as long as there's files on the heap - pop
-	for len(h) > 0 {
-		latest := heap.Pop(&h).(QueueItem) // pop from the heap
-		lastPulledSize = latest.priority   // capture the size of the most recent file pulled
-		for key, val := range latest.Item.Subdirectories {
-			if key != ".." {
-				if size := totalFileSize(val); size >= spaceToClear {
-					heap.Push(&h, QueueItem{val, totalFileSize(val)})
-				}
-			}
-		}
-	}
-
-	return lastPulledSize
-}
-
-func PuzzlePartTwoAlt(root *Directory) int {
 	// This will be an iterative Breadth First Search
 	// Pull a file off the queue, check if it's sized appropriately 
 	deque := make([]*Directory, 0) // make a deque for our iterative BFS
@@ -247,5 +193,5 @@ func main() {
 	root := ParseInput(lines)
 
 	fmt.Printf("Part One Solution: %v\n", PuzzlePartOne(&root))
-	fmt.Printf("Part Two Solution: %v\n", PuzzlePartTwoAlt(&root))
+	fmt.Printf("Part Two Solution: %v\n", PuzzlePartTwo(&root))
 }
