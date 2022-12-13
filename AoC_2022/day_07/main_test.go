@@ -29,7 +29,6 @@ var TestInput = []string{
 	"7214296 k",
 }
 
-
 func TestParser(t *testing.T) {
 	result := ParseInput(TestInput)
 	expectedFiles := []SystemFile{
@@ -64,11 +63,29 @@ func TestParser(t *testing.T) {
 	}
 }
 
-func TestPartOne(t *testing.T) {
-	result := ParseInput(TestInput)
-	sum := Solver(&result, 100000)
-	expected := 95437
-	if sum != expected {
-		t.Errorf("Part one Failed, expected %v, got %v", expected, sum)
+func TestSizeCalculation(t *testing.T) {
+	root := ParseInput(TestInput)
+	totalFileSize(&root) // run calculation once - it should calculate for all subdirectories
+	testCases := []struct {
+		dir          *Directory
+		expectedSize int
+	}{
+		{&root, 48381165},
+		{root.Subdirectories["d"], 24933642},
+		{root.Subdirectories["a"], 94853},
+		{root.Subdirectories["a"].Subdirectories["e"], 584},
 	}
+	for _, testCase := range testCases {
+		if exp, act := testCase.expectedSize, testCase.dir.size; exp != act {
+			t.Errorf("Incorrect File Size for directory %v. Expected %v, got %v", testCase.dir.Name, exp, act)
+		}
+	}
+}
+
+func TestPartOne(t *testing.T) {
+	root := ParseInput(TestInput)
+	if exp, act := 95437, PuzzlePartOne(&root); exp != act {
+		t.Errorf("Part One Solution Failed. Expected %v, got %v", exp, act)
+	}
+
 }
