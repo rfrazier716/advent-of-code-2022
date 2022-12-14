@@ -97,3 +97,19 @@ func TestSandFill(t *testing.T) {
 		t.Errorf("Part One Test Failed. Expected %v, got %v", exp, act)
 	}
 }
+
+func TestParser(t *testing.T) {
+	input := []string{
+		"498,4 -> 498,6 -> 496,6",
+		"503,4 -> 502,4 -> 502,9 -> 494,9",
+	}
+
+	trap := ParseInput(input)
+	expected := newTestTrap()
+	if trap.min != expected.min{
+		t.Errorf("Error with Parser: Mins don't match. Expected %v, got %v", expected.min, trap.min)
+	}
+	if trap.max != expected.max{
+		t.Errorf("Error with Parser: Maxes don't match. Expected %v, got %v", expected.max, trap.max)
+	}
+}
